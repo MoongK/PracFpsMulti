@@ -6,12 +6,18 @@ using UnityEngine.Networking;
 public class IKController : NetworkBehaviour {
 
     Animator anim;
-    public Transform lookTarget;
-    float angleX = 0f;
+
+    Quaternion changeToThisRot;
+    Vector3 CharacterAngle;
+
+    float angleSpeed;
 
     private void Start()
     {
         anim = GetComponent<Animator>();
+        changeToThisRot = anim.GetBoneTransform(HumanBodyBones.UpperChest).localRotation;
+        CharacterAngle = new Vector3(changeToThisRot.x, changeToThisRot.y, changeToThisRot.z);
+        angleSpeed = GetComponent<PlayerController>().angleSpeed;
     }
 
 
@@ -22,25 +28,15 @@ public class IKController : NetworkBehaviour {
 
         anim.SetLookAtWeight(0f);
 
-        float mouseX = Input.GetAxisRaw("Mouse X");
-        angleX  += mouseX;
+        float mouseY = Input.GetAxisRaw("Mouse Y");
 
-        if (Input.GetAxisRaw("Mouse Y") > 0f)
-        {
-            anim.SetBoneLocalRotation(HumanBodyBones.UpperChest, Quaternion.Lerp(anim.GetBoneTransform(HumanBodyBones.UpperChest).localRotation,    // From
-                                                                             Quaternion.Euler(DataScript.PlayerUpPose), // To
-                                                                             10f * Input.GetAxisRaw("Mouse Y") * Time.deltaTime));  // Speed
-        }
-        else
-        {
-            anim.SetBoneLocalRotation(HumanBodyBones.UpperChest, Quaternion.Lerp(anim.GetBoneTransform(HumanBodyBones.UpperChest).localRotation,    //From
-                                                                             Quaternion.Euler(DataScript.PlayerDownPose),   // To
-                                                                             10f * -Input.GetAxisRaw("Mouse Y") * Time.deltaTime));  // Speed
-        }
+        if (mouseY > 0f)
+            CharacterAngle = Vector3.MoveTowards(CharacterAngle, DataScript.PlayerUpPose, angleSpeed * mouseY * Time.deltaTime);
+        else if(mouseY < 0f)
+            CharacterAngle = Vector3.MoveTowards(CharacterAngle, DataScript.PlayerDownPose, angleSpeed * -mouseY * Time.deltaTime);
 
-        print("origin : " + anim.GetBoneTransform(HumanBodyBones.UpperChest).localRotation);
-        print("up : " + Quaternion.Euler(DataScript.PlayerUpPose));
-        print("down : " + Quaternion.Euler(DataScript.PlayerDownPose));
+        changeToThisRot = Quaternion.Euler(CharacterAngle);
+        anim.SetBoneLocalRotation(HumanBodyBones.UpperChest, changeToThisRot);
 
     }
 }

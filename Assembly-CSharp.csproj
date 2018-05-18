@@ -63,6 +63,7 @@
     <Compile Include="Assets\IKController.cs" />
     <Compile Include="Assets\PlayerController.cs" />
     <Compile Include="Assets\Scripts\DataScript.cs" />
+    <Compile Include="Assets\tester.cs" />
     <None Include="Assets\Packs\Weapons Pack(LOW POLY)\Weapons Pack info.txt" />
     <None Include="Assets\Packs\Cartoon Temple Building Kit\ReadMe.txt" />
     <Reference Include="UnityEditor.StandardEvents">
